@@ -1,13 +1,19 @@
+import os
+
+from dotenv import load_dotenv
 from groq import Groq
 from groq.types.chat import ChatCompletion
 
-GROQ_API_KEY = "YOUR_GROQ_API_KEY"
-GROQ_MODEL = "YOUR_GROQ_MODEL"
+load_dotenv()
+
+API_KEY = os.getenv("OPENAI_API_KEY")
+BASE_URL = os.getenv("OPENAI_BASE_URL")
+MODEL = os.getenv("MODEL")
 
 
 def call_groq_chat_completion(message: str) -> ChatCompletion:
-    client = Groq(api_key=GROQ_API_KEY)
+    client = Groq(api_key=API_KEY, base_url=BASE_URL)
     return client.chat.completions.create(
-        model=GROQ_MODEL,
+        model=MODEL,
         messages=[{"role": "user", "content": message}],
     )
