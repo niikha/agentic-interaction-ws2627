@@ -5,9 +5,8 @@ from .apicaller import call_groq_chat_completion
 
 def main() -> str:
     parser = argparse.ArgumentParser()
-    parser.add_argument("value", help="String to pass to the agent")
+    parser.add_argument("value")
     args = parser.parse_args()
-    print(args.value)
     completion = call_groq_chat_completion(args.value)
     content = completion.choices[0].message.content
     if content is None or content.strip() == "":
