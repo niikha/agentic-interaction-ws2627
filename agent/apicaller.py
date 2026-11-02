@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from groq import Groq
 from groq.types.chat import ChatCompletion
 
-from .dataprovider import dataprovider
+from .dataprovider import get_calendar_entries
 
 load_dotenv()
 
@@ -14,14 +14,12 @@ MODEL = os.getenv("MODEL")
 
 
 def call_groq_chat_completion(message: str) -> ChatCompletion:
-    #get calendar data for context
-    documents = [
-        {"source": {"type": "text", "text": entry}}
-        for entry in dataprovider().get_calendar_entries()
-    ]
+    message_with_calendar = "\n\n".join([*get_calendar_entries(), message])
     client = Groq(api_key=API_KEY, base_url=BASE_URL)
     return client.chat.completions.create(
         model=MODEL,
-        messages=[{"role": "user", "content": message}],
-        documents=documents,
+        messages=[
+            {"role": "system", "content": "Answer using only the provided documents. If the answer isn't in them, say so."},
+            {"role": "user", "content": message_with_calendar},
+        ],
     )
