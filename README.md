@@ -1,11 +1,11 @@
 # Calendar Agent
 
-Calendar Agent answers prompts using daily calendar data and a Groq chat completion. It retrieves calendar JSON files for October 26 through November 8, 2026 and asks the configured model to answer using that information.
+Calendar Agent answers prompts using daily calendar data and a Groq chat completion. When calendar information is needed, the configured model calls a calendar tool to retrieve only the relevant dates from October 26 through November 8, 2026.
 
 ## Prerequisites
 
 - Python 3.9 or later.
-- Access to a Groq-compatible chat completion API and the calendar data endpoint.
+- Access to a Groq-compatible chat completion API with tool/function-calling support, and the calendar data endpoint.
 - Install the project dependencies from the repository root:
 
   ```shell
