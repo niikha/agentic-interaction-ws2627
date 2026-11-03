@@ -16,13 +16,18 @@ def get_calendar_entries(start_date: str, end_date: str) -> list[str]:
     start = _parse_calendar_date(start_date)
     end = _parse_calendar_date(end_date)
 
+    #a few sanity checks
+
     if start > end:
         raise ValueError("start_date must be on or before end_date")
+    
     if start < CALENDAR_START_DATE or end > CALENDAR_END_DATE:
         raise ValueError(
             "Requested dates must be between "
             f"{CALENDAR_START_DATE.isoformat()} and {CALENDAR_END_DATE.isoformat()}"
         )
+
+    #get entries
 
     entries = []
     current_date = start
@@ -34,10 +39,14 @@ def get_calendar_entries(start_date: str, end_date: str) -> list[str]:
         try:
             with urlopen(url) as response:
                 entries.append(response.read().decode("utf-8"))
+        
+        #404 error: add "no data available" instead
+        
         except HTTPError as error:
             if error.code != 404:
                 raise
             entries.append(f"No data available for {current_date_string}")
+        
         current_date += timedelta(days=1)
 
     return entries

@@ -67,7 +67,12 @@ def call_groq_chat_completion(message: str, run_logger: logger) -> ChatCompletio
     ]
 
     for tool_round in range(MAX_TOOL_ROUNDS + 1):
-        completion = _create_completion(client, messages, run_logger)
+        completion = client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="auto",
+        )
         assistant_message = completion.choices[0].message
 
         if not assistant_message.tool_calls:
@@ -94,45 +99,6 @@ def call_groq_chat_completion(message: str, run_logger: logger) -> ChatCompletio
             )
 
     raise RuntimeError("Groq did not return a final response")
-
-
-def _create_completion(
-    client: Groq,
-    messages: list[dict],
-    run_logger: logger,
-) -> ChatCompletion:
-    arguments = {
-        "model": MODEL,
-        "messages": messages,
-        "tools": TOOLS,
-        "tool_choice": "auto",
-    }
-    tool = "groq.chat.completions.create"
-    run_logger.log_event(Event.TOOL_CALL, tool=tool, args=arguments, model=MODEL)
-    api_call_started_at = perf_counter()
-    result_args = None
-    succeeded = False
-
-    try:
-        completion = client.chat.completions.create(**arguments)
-        result_args = completion.model_dump(mode="json")
-        succeeded = True
-        return completion
-    except Exception as error:
-        result_args = {
-            "exception_type": type(error).__name__,
-            "exception": str(error),
-        }
-        raise
-    finally:
-        run_logger.log_event(
-            Event.TOOL_RESULT,
-            tool=tool,
-            args=result_args,
-            ok=succeeded,
-            model=MODEL,
-            duration_ms=(perf_counter() - api_call_started_at) * 1000,
-        )
 
 
 def _run_calendar_tool(name: str, arguments_json: str, run_logger: logger) -> str:
