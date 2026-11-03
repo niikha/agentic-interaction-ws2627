@@ -20,11 +20,13 @@ def get_calendar_entries() -> list[str]:
         url = f"{DATA_BASE_URL.rstrip('/')}/calendar/{current_date_string}.json"
 
         #Get calendar data for each day
+
         try:
             with urlopen(url) as response:
                 entries.append(response.read().decode("utf-8"))
 
         #404 error: add "No data available" instead
+        
         except HTTPError as error:
             if error.code != 404:
                 raise
