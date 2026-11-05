@@ -1,6 +1,6 @@
 import argparse
 
-from .apicaller import call_groq_chat_completion
+from .apicaller import call_openai_chat_completion
 from .logger import Event, logger
 
 
@@ -16,9 +16,9 @@ def main() -> str:
         args = parser.parse_args()
         run_logger.log_event(Event.USER_TASK, args={"message": args.value})
 
-        #call groq api with request
+        #call OpenAI API with request
 
-        completion = call_groq_chat_completion(args.value, run_logger)
+        completion = call_openai_chat_completion(args.value, run_logger)
 
         content = completion.choices[0].message.content
         run_logger.log_event(Event.FINAL, args={"message": content})

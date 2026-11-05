@@ -3,8 +3,8 @@ import os
 from time import perf_counter
 
 from dotenv import load_dotenv
-from groq import Groq
-from groq.types.chat import ChatCompletion
+from openai import OpenAI
+from openai.types.chat import ChatCompletion
 
 from .dataprovider import (
     CALENDAR_END_DATE,
@@ -59,8 +59,8 @@ TOOLS = [
 ]
 
 
-def call_groq_chat_completion(message: str, run_logger: logger) -> ChatCompletion:
-    client = Groq(api_key=API_KEY, base_url=BASE_URL)
+def call_openai_chat_completion(message: str, run_logger: logger) -> ChatCompletion:
+    client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": message},
@@ -80,7 +80,7 @@ def call_groq_chat_completion(message: str, run_logger: logger) -> ChatCompletio
 
         if tool_round == MAX_TOOL_ROUNDS:
             raise RuntimeError(
-                f"Groq exceeded the maximum of {MAX_TOOL_ROUNDS} calendar tool rounds"
+                f"OpenAI exceeded the maximum of {MAX_TOOL_ROUNDS} calendar tool rounds"
             )
 
         messages.append(assistant_message.model_dump(mode="json", exclude_none=True))
@@ -98,7 +98,7 @@ def call_groq_chat_completion(message: str, run_logger: logger) -> ChatCompletio
                 }
             )
 
-    raise RuntimeError("Groq did not return a final response")
+    raise RuntimeError("OpenAI did not return a final response")
 
 
 def _run_calendar_tool(name: str, arguments_json: str, run_logger: logger) -> str:
@@ -114,7 +114,7 @@ def _run_calendar_tool(name: str, arguments_json: str, run_logger: logger) -> st
 
     try:
         if name != "get_calendar_entries":
-            raise ValueError(f"Unsupported Groq tool: {name}")
+            raise ValueError(f"Unsupported OpenAI tool: {name}")
 
         arguments = json.loads(arguments_json)
         start_date = arguments["start_date"]
