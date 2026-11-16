@@ -1,6 +1,6 @@
 # Calendar Agent
 
-Calendar Agent answers prompts using daily calendar data and an OpenAI chat completion. When calendar information is needed, the configured model calls a calendar tool to retrieve only the relevant dates from October 26 through November 8, 2026.
+Calendar Agent answers prompts using daily calendar data and an OpenAI chat completion. When calendar information is needed, the configured model calls a calendar tool to retrieve data for a relevant date from October 26 through November 8, 2026.
 
 ## Prerequisites
 

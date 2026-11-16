@@ -1,17 +1,11 @@
-import json
 import os
-from time import perf_counter
 
 from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
 
-from .dataprovider import (
-    CALENDAR_END_DATE,
-    CALENDAR_START_DATE,
-    get_calendar_entries,
-)
-from .logger import Event, logger
+from .logger import logger
+from .tools.toolprovider import toolprovider
 
 load_dotenv()
 
@@ -22,45 +16,16 @@ MODEL = os.getenv("MODEL")
 MAX_TOOL_ROUNDS = 10
 SYSTEM_PROMPT = (
     "Answer the user's question using calendar data. When calendar information "
-    "is needed, call get_calendar_entries for the relevant date range before "
-    "answering. The available calendar dates are "
-    f"{CALENDAR_START_DATE.isoformat()} through {CALENDAR_END_DATE.isoformat()}. "
+    "is needed, call get_calendar_entries for the relevant date before "
+    "answering. "
     "If the answer is not available in the returned data, say so."
 )
-TOOLS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_calendar_entries",
-            "description": (
-                "Retrieve calendar entries for an inclusive date range. "
-                f"Available dates: {CALENDAR_START_DATE.isoformat()} through "
-                f"{CALENDAR_END_DATE.isoformat()}."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "start_date": {
-                        "type": "string",
-                        "format": "date",
-                        "description": "First calendar date, in YYYY-MM-DD format.",
-                    },
-                    "end_date": {
-                        "type": "string",
-                        "format": "date",
-                        "description": "Last calendar date, in YYYY-MM-DD format.",
-                    },
-                },
-                "required": ["start_date", "end_date"],
-                "additionalProperties": False,
-            },
-        },
-    }
-]
 
 
 def call_openai_chat_completion(message: str, run_logger: logger) -> ChatCompletion:
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
+    tool_provider = toolprovider(run_logger, MODEL)
+    tool_definitions = tool_provider.get_tool_definitions()
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": message},
@@ -70,7 +35,7 @@ def call_openai_chat_completion(message: str, run_logger: logger) -> ChatComplet
         completion = client.chat.completions.create(
             model=MODEL,
             messages=messages,
-            tools=TOOLS,
+            tools=tool_definitions,
             tool_choice="auto",
         )
         assistant_message = completion.choices[0].message
@@ -85,10 +50,9 @@ def call_openai_chat_completion(message: str, run_logger: logger) -> ChatComplet
 
         messages.append(assistant_message.model_dump(mode="json", exclude_none=True))
         for tool_call in assistant_message.tool_calls:
-            result = _run_calendar_tool(
+            result = tool_provider.run_tool(
                 tool_call.function.name,
                 tool_call.function.arguments,
-                run_logger,
             )
             messages.append(
                 {
@@ -99,45 +63,3 @@ def call_openai_chat_completion(message: str, run_logger: logger) -> ChatComplet
             )
 
     raise RuntimeError("OpenAI did not return a final response")
-
-
-def _run_calendar_tool(name: str, arguments_json: str, run_logger: logger) -> str:
-    run_logger.log_event(
-        Event.TOOL_CALL,
-        tool=name,
-        args=arguments_json,
-        model=MODEL,
-    )
-    started_at = perf_counter()
-    result_args = None
-    succeeded = False
-
-    try:
-        if name != "get_calendar_entries":
-            raise ValueError(f"Unsupported OpenAI tool: {name}")
-
-        arguments = json.loads(arguments_json)
-        start_date = arguments["start_date"]
-        end_date = arguments["end_date"]
-
-        entries = get_calendar_entries(start_date, end_date)
-        result_args = {"entries": entries}
-        succeeded = True
-        return json.dumps(entries)
-    
-    except Exception as error:
-        result_args = {
-            "exception_type": type(error).__name__,
-            "exception": str(error),
-        }
-        raise
-
-    finally:
-        run_logger.log_event(
-            Event.TOOL_RESULT,
-            tool=name,
-            args=result_args,
-            ok=succeeded,
-            model=MODEL,
-            duration_ms=(perf_counter() - started_at) * 1000,
-        )
