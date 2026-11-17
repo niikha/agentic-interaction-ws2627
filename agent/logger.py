@@ -17,6 +17,7 @@ class Event(str, Enum):
 class logger:
     def __init__(self) -> None:
         self.run_id = str(uuid4())
+        self.model: Optional[str] = None
         log_directory = Path(__file__).resolve().parent.parent / "log"
         log_directory.mkdir(parents=True, exist_ok=True)
         log_date = datetime.now(timezone.utc).date().isoformat()
@@ -29,7 +30,6 @@ class logger:
         tool: Optional[str] = None,
         args: Optional[Any] = None,
         ok: bool = True,
-        model: Optional[str] = None,
         duration_ms: Optional[float] = None,
     ) -> None:
 
@@ -40,7 +40,7 @@ class logger:
             "tool": tool,
             "args": args,
             "ok": ok,
-            "model": model,
+            "model": self.model,
             "duration_ms": duration_ms,
         }
         with self.log_file.open("a", encoding="utf-8") as log_file:

@@ -9,7 +9,7 @@ from .tool import tool
 class toolprovider:
     def __init__(self, run_logger: logger, model: Optional[str]) -> None:
         self.run_logger = run_logger
-        self.model = model
+        self.run_logger.model = model
         self.tools: List[tool] = [calendar()]
 
     def get_tool_definitions(self) -> List[Dict[str, Any]]:
@@ -30,7 +30,6 @@ class toolprovider:
             Event.TOOL_CALL,
             tool=name,
             args=arguments_json,
-            model=self.model,
         )
         started_at = perf_counter()
         result_args = None
@@ -62,6 +61,5 @@ class toolprovider:
                 tool=name,
                 args=result_args,
                 ok=succeeded,
-                model=self.model,
                 duration_ms=(perf_counter() - started_at) * 1000,
             )

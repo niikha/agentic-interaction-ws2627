@@ -16,8 +16,7 @@ MODEL = os.getenv("MODEL")
 MAX_TOOL_ROUNDS = 10
 SYSTEM_PROMPT = (
     "Answer the user's question using calendar data. When calendar information "
-    "is needed, call get_calendar_entries for the relevant date before "
-    "answering. "
+    "is needed, call get_calendar_entries for the relevant date before answering. "
     "If the answer is not available in the returned data, say so."
 )
 
