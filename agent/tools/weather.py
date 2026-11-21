@@ -32,7 +32,7 @@ class weather(tool):
                 "city": {
                     "type": "string",
                     "minLength": 1,
-                    "description": "City to retrieve weather for. Must be lowercase and in german with umlauts replaced.",
+                    "description": "City to retrieve weather for. Provide the name in German.",
                 },
                 "date": {
                     "type": "string",
@@ -54,9 +54,10 @@ class weather(tool):
         if not city.strip():
             raise ValueError("City must not be empty")
 
+        city_name = utils.normalize_city_name(city.strip())
         parsed_date = utils.parse_date(value)
         date_string = parsed_date.isoformat()
-        city_path = quote(city.strip(), safe="")
+        city_path = quote(city_name, safe="")
         url = f"{DATA_BASE_URL.rstrip('/')}/weather/{city_path}/{date_string}.json"
 
         try:
@@ -65,4 +66,4 @@ class weather(tool):
         except HTTPError as error:
             if error.code != 404:
                 raise
-            return f"No weather data available for {city.strip()} on {date_string}"
+            return f"No weather data available for {city_name} on {date_string}"

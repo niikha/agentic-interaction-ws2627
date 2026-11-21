@@ -1,11 +1,11 @@
-# Calendar and Weather Agent
+# Calendar, Weather, and Transit Agent
 
-The agent answers prompts using daily calendar and weather data with an OpenAI chat completion. When calendar or weather information is needed, the configured model calls the corresponding tool for the relevant date.
+The agent answers prompts using daily calendar, weather, and train connection data with an OpenAI chat completion. When this information is needed, the configured model calls the corresponding tool.
 
 ## Prerequisites
 
 - Python 3.9 or later.
-- Access to the OpenAI API with tool/function-calling support, and the calendar and weather data endpoints.
+- Access to the OpenAI API with tool/function-calling support, and the calendar, weather, and transit data endpoints.
 - Install the project dependencies from the repository root:
 
   ```shell
@@ -21,7 +21,7 @@ The agent answers prompts using daily calendar and weather data with an OpenAI c
   DATA_BASE_URL=https://your-data-host
   ```
 
-  `OPENAI_API_KEY` authenticates with the OpenAI API. `OPENAI_BASE_URL` is the API base URL passed to the OpenAI client; use the host/base URL without appending the chat-completions route. `MODEL` is the model identifier sent with the completion request. `DATA_BASE_URL` is the root URL for the data files. Calendar files are requested from `{DATA_BASE_URL}/calendar/YYYY-MM-DD.json`; weather files are requested from `{DATA_BASE_URL}/weather/{city}YYYY-MM-DD.json`.
+  `OPENAI_API_KEY` authenticates with the OpenAI API. `OPENAI_BASE_URL` is the API base URL passed to the OpenAI client; use the host/base URL without appending the chat-completions route. `MODEL` is the model identifier sent with the completion request. `DATA_BASE_URL` is the root URL for the data files. Calendar files are requested from `{DATA_BASE_URL}/calendar/YYYY-MM-DD.json`; weather files are requested from `{DATA_BASE_URL}/weather/{city}/YYYY-MM-DD.json`; train connections are requested from `{DATA_BASE_URL}/transit/{from}/{to}/YYYY-MM-DD.json`.
 
 ## Run
 
