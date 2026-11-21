@@ -15,9 +15,13 @@ MODEL = os.getenv("MODEL")
 
 MAX_TOOL_ROUNDS = 10
 SYSTEM_PROMPT = (
-    "Answer the user's question using calendar data. When calendar information "
-    "is needed, call get_calendar_entries for the relevant date before answering. "
-    "If the answer is not available in the returned data, say so."
+    "Answer the user's question using calendar and weather data. When calendar "
+    "information is needed, call get_calendar_entries for the relevant date "
+    "before answering. When weather information is needed, call get_weather "
+    "for the relevant city and date before answering. "
+    "If the answer is not available in the returned data, say so. "
+    "If no year is given, assume 2026."
+    "You can make multiple tool calls per round."
 )
 
 

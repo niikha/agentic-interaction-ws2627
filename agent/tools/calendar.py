@@ -1,6 +1,5 @@
 import json
 import os
-from datetime import date
 from typing import Any, Dict
 from urllib.error import HTTPError
 from urllib.request import urlopen
@@ -8,6 +7,7 @@ from urllib.request import urlopen
 from dotenv import load_dotenv
 
 from .tool import tool
+from ..utils import utils
 
 load_dotenv()
 
@@ -43,7 +43,7 @@ class calendar(tool):
         return json.dumps(self._get_calendar_entries(arguments["date"]))
 
     def _get_calendar_entries(self, value: str) -> str:
-        parsed_date = self._parse_calendar_date(value)
+        parsed_date = utils.parse_date(value)
         date_string = parsed_date.isoformat()
         url = f"{DATA_BASE_URL.rstrip('/')}/calendar/{date_string}.json"
 
@@ -54,10 +54,3 @@ class calendar(tool):
             if error.code != 404:
                 raise
             return f"No data available for {date_string}"
-
-    @staticmethod
-    def _parse_calendar_date(value: str) -> date:
-        parsed_date = date.fromisoformat(value)
-        if parsed_date.isoformat() != value:
-            raise ValueError(f"Date must use YYYY-MM-DD format: {value}")
-        return parsed_date

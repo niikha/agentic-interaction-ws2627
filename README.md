@@ -1,11 +1,11 @@
-# Calendar Agent
+# Calendar and Weather Agent
 
-Calendar Agent answers prompts using daily calendar data and an OpenAI chat completion. When calendar information is needed, the configured model calls a calendar tool to retrieve data for a relevant date from October 26 through November 8, 2026.
+The agent answers prompts using daily calendar and weather data with an OpenAI chat completion. When calendar or weather information is needed, the configured model calls the corresponding tool for the relevant date.
 
 ## Prerequisites
 
 - Python 3.9 or later.
-- Access to the OpenAI API with tool/function-calling support, and the calendar data endpoint.
+- Access to the OpenAI API with tool/function-calling support, and the calendar and weather data endpoints.
 - Install the project dependencies from the repository root:
 
   ```shell
@@ -18,10 +18,10 @@ Calendar Agent answers prompts using daily calendar data and an OpenAI chat comp
   OPENAI_API_KEY=your_api_key
   OPENAI_BASE_URL=https://api.openai.com/v1
   MODEL=your_model_id
-  DATA_BASE_URL=https://your-calendar-data-host
+  DATA_BASE_URL=https://your-data-host
   ```
 
-  `OPENAI_API_KEY` authenticates with the OpenAI API. `OPENAI_BASE_URL` is the API base URL passed to the OpenAI client; use the host/base URL without appending the chat-completions route. `MODEL` is the model identifier sent with the completion request. `DATA_BASE_URL` is the root URL for the calendar files, which are requested from `{DATA_BASE_URL}/calendar/YYYY-MM-DD.json`.
+  `OPENAI_API_KEY` authenticates with the OpenAI API. `OPENAI_BASE_URL` is the API base URL passed to the OpenAI client; use the host/base URL without appending the chat-completions route. `MODEL` is the model identifier sent with the completion request. `DATA_BASE_URL` is the root URL for the data files. Calendar files are requested from `{DATA_BASE_URL}/calendar/YYYY-MM-DD.json`; weather files are requested from `{DATA_BASE_URL}/weather/{city}YYYY-MM-DD.json`.
 
 ## Run
 

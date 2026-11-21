@@ -4,13 +4,14 @@ from typing import Any, Dict, List, Optional
 from ..logger import Event, logger
 from .calendar import calendar
 from .tool import tool
+from .weather import weather
 
 
 class toolprovider:
     def __init__(self, run_logger: logger, model: Optional[str]) -> None:
         self.run_logger = run_logger
         self.run_logger.model = model
-        self.tools: List[tool] = [calendar()]
+        self.tools: List[tool] = [calendar(), weather()]
 
     def get_tool_definitions(self) -> List[Dict[str, Any]]:
         return [
