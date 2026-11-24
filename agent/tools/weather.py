@@ -2,7 +2,6 @@ import json
 import os
 from typing import Any, Dict
 from urllib.error import HTTPError
-from urllib.parse import quote
 from urllib.request import urlopen
 
 from dotenv import load_dotenv
@@ -46,24 +45,20 @@ class weather(tool):
 
     def run(self, arguments_json: str) -> str:
         arguments = json.loads(arguments_json)
-        return json.dumps(
-            self._get_weather(arguments["city"], arguments["date"])
-        )
-
-    def _get_weather(self, city: str, value: str) -> str:
+        city = arguments["city"]
         if not city.strip():
             raise ValueError("City must not be empty")
 
-        city_name = utils.normalize_city_name(city.strip())
-        parsed_date = utils.parse_date(value)
+        city_path = utils.normalize_city_name(city.strip())
+        parsed_date = utils.parse_date(arguments["date"])
         date_string = parsed_date.isoformat()
-        city_path = quote(city_name, safe="")
         url = f"{DATA_BASE_URL.rstrip('/')}/weather/{city_path}/{date_string}.json"
 
         try:
             with urlopen(url) as response:
-                return response.read().decode("utf-8")
+                result = response.read().decode("utf-8")
         except HTTPError as error:
             if error.code != 404:
                 raise
-            return f"No weather data available for {city_name} on {date_string}"
+            result = f"No weather data available for {city.strip()} on {date_string}"
+        return json.dumps(result)

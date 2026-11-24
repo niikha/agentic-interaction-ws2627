@@ -1,12 +1,14 @@
 from datetime import date
+from urllib.parse import quote
 
 
 class utils:
     @staticmethod
     def normalize_city_name(value: str) -> str:
-        return value.lower().translate(
+        normalized = value.lower().translate(
             str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue"})
         )
+        return quote(normalized, safe="")
 
     @staticmethod
     def parse_date(value: str) -> date:

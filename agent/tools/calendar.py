@@ -40,17 +40,15 @@ class calendar(tool):
 
     def run(self, arguments_json: str) -> str:
         arguments = json.loads(arguments_json)
-        return json.dumps(self._get_calendar_entries(arguments["date"]))
-
-    def _get_calendar_entries(self, value: str) -> str:
-        parsed_date = utils.parse_date(value)
+        parsed_date = utils.parse_date(arguments["date"])
         date_string = parsed_date.isoformat()
         url = f"{DATA_BASE_URL.rstrip('/')}/calendar/{date_string}.json"
 
         try:
             with urlopen(url) as response:
-                return response.read().decode("utf-8")
+                result = response.read().decode("utf-8")
         except HTTPError as error:
             if error.code != 404:
                 raise
-            return f"No data available for {date_string}"
+            result = f"No data available for {date_string}"
+        return json.dumps(result)

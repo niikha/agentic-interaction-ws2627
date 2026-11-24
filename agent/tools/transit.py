@@ -2,7 +2,6 @@ import json
 import os
 from typing import Any, Dict
 from urllib.error import HTTPError
-from urllib.parse import quote
 from urllib.request import urlopen
 
 from dotenv import load_dotenv
@@ -54,26 +53,17 @@ class transit(tool):
 
     def run(self, arguments_json: str) -> str:
         arguments = json.loads(arguments_json)
-        return json.dumps(
-            self._get_transit(
-                arguments["from"],
-                arguments["to"],
-                arguments["date"],
-            )
-        )
-
-    def _get_transit(self, from_city: str, to_city: str, value: str) -> str:
+        from_city = arguments["from"]
+        to_city = arguments["to"]
         if not from_city.strip():
             raise ValueError("Departure city must not be empty")
         if not to_city.strip():
             raise ValueError("Destination city must not be empty")
 
-        from_city_name = utils.normalize_city_name(from_city.strip())
-        to_city_name = utils.normalize_city_name(to_city.strip())
-        parsed_date = utils.parse_date(value)
+        from_path = utils.normalize_city_name(from_city.strip())
+        to_path = utils.normalize_city_name(to_city.strip())
+        parsed_date = utils.parse_date(arguments["date"])
         date_string = parsed_date.isoformat()
-        from_path = quote(from_city_name, safe="")
-        to_path = quote(to_city_name, safe="")
         url = (
             f"{DATA_BASE_URL.rstrip('/')}/transit/"
             f"{from_path}/{to_path}/{date_string}.json"
@@ -81,11 +71,12 @@ class transit(tool):
 
         try:
             with urlopen(url) as response:
-                return response.read().decode("utf-8")
+                result = response.read().decode("utf-8")
         except HTTPError as error:
             if error.code != 404:
                 raise
-            return (
-                f"No train connections available from {from_city_name} "
-                f"to {to_city_name} on {date_string}"
+            result = (
+                f"No train connections available from {from_city.strip()} "
+                f"to {to_city.strip()} on {date_string}"
             )
+        return json.dumps(result)
