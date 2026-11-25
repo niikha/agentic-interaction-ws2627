@@ -55,10 +55,6 @@ class transit(tool):
         arguments = json.loads(arguments_json)
         from_city = arguments["from"]
         to_city = arguments["to"]
-        if not from_city.strip():
-            raise ValueError("Departure city must not be empty")
-        if not to_city.strip():
-            raise ValueError("Destination city must not be empty")
 
         from_path = utils.normalize_city_name(from_city.strip())
         to_path = utils.normalize_city_name(to_city.strip())
@@ -76,7 +72,7 @@ class transit(tool):
             if error.code != 404:
                 raise
             result = (
-                f"No train connections available from {from_city.strip()} "
+                f"No data for train connections available from {from_city.strip()} "
                 f"to {to_city.strip()} on {date_string}"
             )
         return json.dumps(result)

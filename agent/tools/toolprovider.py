@@ -6,13 +6,19 @@ from .calendar import calendar
 from .tool import tool
 from .transit import transit
 from .weather import weather
+from .weather2 import weather2
 
 
 class toolprovider:
     def __init__(self, run_logger: logger, model: Optional[str]) -> None:
         self.run_logger = run_logger
         self.run_logger.model = model
-        self.tools: List[tool] = [calendar(), weather(), transit()]
+        self.tools: List[tool] = [
+            calendar(), 
+            #weather(), 
+            weather2(), 
+            transit()
+            ]
 
     def get_tool_definitions(self) -> List[Dict[str, Any]]:
         return [
