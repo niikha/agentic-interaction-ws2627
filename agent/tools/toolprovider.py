@@ -14,9 +14,9 @@ class toolprovider:
         self.run_logger = run_logger
         self.run_logger.model = model
         self.tools: List[tool] = [
-            calendar(), 
-            #weather(), 
-            weather2(), 
+            calendar(),
+            #weather(),
+            weather2(),
             transit()
             ]
 

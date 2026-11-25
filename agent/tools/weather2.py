@@ -45,7 +45,8 @@ class weather2(tool):
         city = arguments["city"].strip()
         if not city:
             raise ValueError("City must not be empty")
-        parsed_date = utils.parse_date(arguments["date"])
+        date_string = arguments["date"]
+        parsed_date = utils.parse_date(date_string)
 
         #Get location for city -> open meteo needs lat / long
 
@@ -74,8 +75,8 @@ class weather2(tool):
                 "longitude": location["longitude"],
                 "daily": "weather_code,temperature_2m_max,temperature_2m_min",
                 "timezone": "auto",
-                "start_date": parsed_date.isoformat(),
-                "end_date": parsed_date.isoformat(),
+                "start_date": date_string,
+                "end_date": date_string,
             }
         )
         with urlopen(weather_url) as response:

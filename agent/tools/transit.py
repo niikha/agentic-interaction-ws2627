@@ -1,17 +1,8 @@
 import json
-import os
 from typing import Any, Dict
-from urllib.error import HTTPError
-from urllib.request import urlopen
-
-from dotenv import load_dotenv
 
 from ..utils import utils
 from .tool import tool
-
-load_dotenv()
-
-DATA_BASE_URL = os.environ["DATA_BASE_URL"]
 
 
 class transit(tool):
@@ -53,26 +44,15 @@ class transit(tool):
 
     def run(self, arguments_json: str) -> str:
         arguments = json.loads(arguments_json)
-        from_city = arguments["from"]
-        to_city = arguments["to"]
+        from_city = arguments["from"].strip()
+        to_city = arguments["to"].strip()
 
-        from_path = utils.normalize_city_name(from_city.strip())
-        to_path = utils.normalize_city_name(to_city.strip())
-        parsed_date = utils.parse_date(arguments["date"])
-        date_string = parsed_date.isoformat()
-        url = (
-            f"{DATA_BASE_URL.rstrip('/')}/transit/"
-            f"{from_path}/{to_path}/{date_string}.json"
+        from_path = utils.normalize_city_name(from_city)
+        to_path = utils.normalize_city_name(to_city)
+        date_string = arguments["date"]
+        utils.parse_date(date_string)
+        return utils.fetch_data(
+            f"transit/{from_path}/{to_path}/{date_string}.json",
+            f"No data for train connections available from {from_city} "
+            f"to {to_city} on {date_string}",
         )
-
-        try:
-            with urlopen(url) as response:
-                result = response.read().decode("utf-8")
-        except HTTPError as error:
-            if error.code != 404:
-                raise
-            result = (
-                f"No data for train connections available from {from_city.strip()} "
-                f"to {to_city.strip()} on {date_string}"
-            )
-        return json.dumps(result)
