@@ -24,6 +24,9 @@ class logger:
         self.log_file = log_directory / f"{log_date}.jsonl"
         self.log_file.touch()
 
+    def get_log_file_name(self) -> str:
+        return str(self.log_file)
+
     def log_event(
         self,
         event: Event,

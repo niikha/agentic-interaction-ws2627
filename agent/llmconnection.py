@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 from openai import OpenAI
-from openai.types.chat import ChatCompletion
 
 from .logger import logger
 from .tools.toolprovider import toolprovider
@@ -22,12 +21,12 @@ SYSTEM_PROMPT = (
     "are needed, call get_transit for the departure city, destination city, "
     "and date before answering. "
     "If the answer is not available in the returned data, say so. "
-    "If no year is given, assume 2026."
-    "You can make multiple tool calls per round."
+    "If no year is given, assume 2026. "
+    "You can make multiple tool calls per round. "
 )
 
 
-def call_openai_chat_completion(message: str, run_logger: logger) -> ChatCompletion:
+def run_agent_loop(message: str, run_logger: logger) -> str:
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
     tool_provider = toolprovider(run_logger, MODEL)
     tool_definitions = tool_provider.get_tool_definitions()
@@ -46,11 +45,13 @@ def call_openai_chat_completion(message: str, run_logger: logger) -> ChatComplet
         assistant_message = completion.choices[0].message
 
         if not assistant_message.tool_calls:
-            return completion
+            if assistant_message.content is None:
+                raise RuntimeError(f"{MODEL} returned no message content")
+            return assistant_message.content
 
         if tool_round == MAX_TOOL_ROUNDS:
             raise RuntimeError(
-                f"OpenAI exceeded the maximum of {MAX_TOOL_ROUNDS} calendar tool rounds"
+                f"{MODEL} exceeded the maximum of {MAX_TOOL_ROUNDS} calendar tool rounds"
             )
 
         messages.append(assistant_message.model_dump(mode="json", exclude_none=True))
@@ -67,4 +68,4 @@ def call_openai_chat_completion(message: str, run_logger: logger) -> ChatComplet
                 }
             )
 
-    raise RuntimeError("OpenAI did not return a final response")
+    raise RuntimeError(f"{MODEL} did not return a final response")

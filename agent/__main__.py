@@ -1,6 +1,6 @@
 import argparse
 
-from .apicaller import call_openai_chat_completion
+from .llmconnection import run_agent_loop
 from .logger import Event, logger
 
 
@@ -18,9 +18,8 @@ def main() -> str:
 
         #call OpenAI API with request
 
-        completion = call_openai_chat_completion(args.value, run_logger)
+        content = run_agent_loop(args.value, run_logger)
 
-        content = completion.choices[0].message.content
         run_logger.log_event(Event.FINAL, args={"message": content})
         return content
     
@@ -34,7 +33,8 @@ def main() -> str:
             },
             ok=False,
         )
-        raise
+        return f"An error occurred while running the agent: \n\n{error}\n\n" \
+        "For more details see " + run_logger.get_log_file_name()
 
 
 if __name__ == "__main__":
