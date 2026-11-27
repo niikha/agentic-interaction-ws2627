@@ -1,11 +1,11 @@
 import json
 from typing import Any, Dict
 
-from .tool import tool
-from ..utils import utils
+from .tool import Tool
+from ..utils import Utils
 
 
-class weather(tool):
+class Weather(Tool):
     @property
     def name(self) -> str:
         return "get_weather"
@@ -40,10 +40,10 @@ class weather(tool):
         if not city:
             raise ValueError("City must not be empty")
 
-        city_path = utils.normalize_city_name(city)
+        city_path = Utils.normalize_city_name(city)
         date_string = arguments["date"]
-        utils.parse_date(date_string)
-        return utils.fetch_data(
+        Utils.parse_date(date_string)
+        return Utils.fetch_data_from_base_url(
             f"weather/{city_path}/{date_string}.json",
             f"No weather data available for {city} on {date_string}",
         )

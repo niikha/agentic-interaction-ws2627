@@ -3,8 +3,8 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from .logger import logger
-from .tools.toolprovider import toolprovider
+from .logger import Logger
+from .tools.toolprovider import ToolProvider
 
 load_dotenv()
 
@@ -16,7 +16,8 @@ MAX_TOOL_ROUNDS = 10
 SYSTEM_PROMPT = (
     "Answer the user's question using calendar, weather, and transit data. When calendar "
     "information is needed, call get_calendar_entries for the relevant date "
-    "before answering. When weather information is needed, call get_weather "
+    "before answering. When the user asks to add an appointment, call "
+    "write_calendar_entry with its date, start time, end time, and title. When weather information is needed, call get_weather "
     "for the relevant city and date before answering. When train connections "
     "are needed, call get_transit for the departure city, destination city, "
     "and date before answering. "
@@ -26,9 +27,9 @@ SYSTEM_PROMPT = (
 )
 
 
-def run_agent_loop(message: str, run_logger: logger) -> str:
+def run_agent_loop(message: str, run_logger: Logger) -> str:
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
-    tool_provider = toolprovider(run_logger, MODEL)
+    tool_provider = ToolProvider(run_logger, MODEL)
     tool_definitions = tool_provider.get_tool_definitions()
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},

@@ -1,11 +1,11 @@
 import json
 from typing import Any, Dict
 
-from ..utils import utils
-from .tool import tool
+from ..utils import Utils
+from .tool import Tool
 
 
-class transit(tool):
+class Transit(Tool):
     @property
     def name(self) -> str:
         return "get_transit"
@@ -47,11 +47,11 @@ class transit(tool):
         from_city = arguments["from"].strip()
         to_city = arguments["to"].strip()
 
-        from_path = utils.normalize_city_name(from_city)
-        to_path = utils.normalize_city_name(to_city)
+        from_path = Utils.normalize_city_name(from_city)
+        to_path = Utils.normalize_city_name(to_city)
         date_string = arguments["date"]
-        utils.parse_date(date_string)
-        return utils.fetch_data(
+        Utils.parse_date(date_string)
+        return Utils.fetch_data_from_base_url(
             f"transit/{from_path}/{to_path}/{date_string}.json",
             f"No data for train connections available from {from_city} "
             f"to {to_city} on {date_string}",

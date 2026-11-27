@@ -1,11 +1,11 @@
 import argparse
 
 from .llmconnection import run_agent_loop
-from .logger import Event, logger
+from .logger import Event, Logger
 
 
 def main() -> str:
-    run_logger = logger()
+    run_logger = Logger()
 
     try:
         parser = argparse.ArgumentParser()

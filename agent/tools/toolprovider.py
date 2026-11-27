@@ -1,23 +1,25 @@
 from time import perf_counter
 from typing import Any, Dict, List, Optional
 
-from ..logger import Event, logger
-from .calendar import calendar
-from .tool import tool
-from .transit import transit
-from .weather import weather
-from .weather2 import weather2
+from ..logger import Event, Logger
+from .readcalendar import ReadCalendar
+from .tool import Tool
+from .transit import Transit
+from .weather import Weather
+from .weather2 import Weather2
+from .writecalendar import WriteCalendar
 
 
-class toolprovider:
-    def __init__(self, run_logger: logger, model: Optional[str]) -> None:
+class ToolProvider:
+    def __init__(self, run_logger: Logger, model: Optional[str]) -> None:
         self.run_logger = run_logger
         self.run_logger.model = model
-        self.tools: List[tool] = [
-            calendar(),
-            #weather(),
-            weather2(),
-            transit()
+        self.tools: List[Tool] = [
+            ReadCalendar(),
+            WriteCalendar(),
+            Weather(),
+            #Weather2(),
+            Transit()
             ]
 
     def get_tool_definitions(self) -> List[Dict[str, Any]]:

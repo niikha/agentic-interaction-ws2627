@@ -1,11 +1,11 @@
 import json
 from typing import Any, Dict
 
-from .tool import tool
-from ..utils import utils
+from .tool import Tool
+from ..utils import Utils
 
 
-class calendar(tool):
+class ReadCalendar(Tool):
     @property
     def name(self) -> str:
         return "get_calendar_entries"
@@ -32,8 +32,8 @@ class calendar(tool):
     def run(self, arguments_json: str) -> str:
         arguments = json.loads(arguments_json)
         date_string = arguments["date"]
-        utils.parse_date(date_string)
-        return utils.fetch_data(
+        Utils.parse_date(date_string)
+        return Utils.fetch_data_from_base_url(
             f"calendar/{date_string}.json",
             f"No data available for {date_string}",
         )

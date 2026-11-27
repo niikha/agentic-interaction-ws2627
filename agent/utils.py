@@ -12,7 +12,7 @@ load_dotenv()
 DATA_BASE_URL = os.environ["DATA_BASE_URL"]
 
 
-class utils:
+class Utils:
     @staticmethod
     def normalize_city_name(value: str) -> str:
         normalized = value.lower().translate(
@@ -28,12 +28,7 @@ class utils:
         return parsed_date
 
     @staticmethod
-    def fetch_data(path: str, not_found_message: str) -> str:
-        """Fetch a JSON file from DATA_BASE_URL.
-
-        Returns the response body JSON-encoded as a string, or
-        not_found_message (also JSON-encoded) if the file does not exist.
-        """
+    def fetch_data_from_base_url(path: str, not_found_message: str) -> str:
         url = f"{DATA_BASE_URL.rstrip('/')}/{path.lstrip('/')}"
 
         try:

@@ -14,7 +14,7 @@ class Event(str, Enum):
     ERROR = "error"
 
 
-class logger:
+class Logger:
     def __init__(self) -> None:
         self.run_id = str(uuid4())
         self.model: Optional[str] = None

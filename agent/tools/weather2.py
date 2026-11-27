@@ -4,11 +4,11 @@ from typing import Any, Dict
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
-from .tool import tool
-from ..utils import utils
+from .tool import Tool
+from ..utils import Utils
 
 
-class weather2(tool):
+class Weather2(Tool):
     @property
     def name(self) -> str:
         return "get_weather"
@@ -46,7 +46,7 @@ class weather2(tool):
         if not city:
             raise ValueError("City must not be empty")
         date_string = arguments["date"]
-        parsed_date = utils.parse_date(date_string)
+        parsed_date = Utils.parse_date(date_string)
 
         #Get location for city -> open meteo needs lat / long
 
